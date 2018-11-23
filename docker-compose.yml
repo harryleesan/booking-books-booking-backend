@@ -1,0 +1,40 @@
+version: '3.1'
+services:
+  booking:
+    image: halosan/flask:dev
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: mysql://root:password@db/booking
+    volumes:
+      - ./:/app
+    links:
+      - db
+    depends_on:
+      - db
+    command: ["/bin/bash", "-c", "while true; do echo hello; sleep 10;done"]
+    container_name: booking
+
+  db:
+    image: mysql:8.0
+    volumes:
+      - ./db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: db
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.7
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      PMA_USER: root
+      PMA_PASSWORD: password
+      # PMA_ARBITRARY: 1
+    ports:
+      - "8081:80"
+    links:
+      - db
+    depends_on:
+      - db
+    container_name: phpmyadmin
