@@ -5,7 +5,8 @@ services:
     ports:
       - "5000:5000"
     environment:
-      DATABASE_URL: mysql://root:password@db/booking
+      DATABASE_URL: mysql+pymysql://root:password@db/booking
+      FLASK_APP: booking.py
     volumes:
       - ./:/app
     links:
