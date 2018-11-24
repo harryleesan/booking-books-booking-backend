@@ -1,5 +1,6 @@
-from app import app
+from app import app, db
 from flask import Flask, jsonify, abort, make_response, request
+from app.models import User, Booking
 
 tasks = [
     {
@@ -15,6 +16,10 @@ tasks = [
         'done': False
     }
 ]
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not Found'}), 404)
 
 @app.route('/api/1.0/tasks', methods=['GET'])
 def get_tasks():
@@ -40,6 +45,13 @@ def create_task():
     tasks.append(task)
     return jsonify({'task': task}), 201
 
-@app.errorhandler(404)
-def not_found(error):
-    return make_response(jsonify({'error': 'Not Found'}), 404)
+@app.route('/api/1.0/create/user', methods=["POST"])
+def create_user():
+    if not request.json or not 'first_name' in request.json:
+        abort(400)
+    u = User(first_name=request.json['first_name'])
+    db.session.add(u)
+    db.session.commit()
+    u_id = User.query.filter_by(first_name=request.json['first_name']).first().id
+    return jsonify({'message': "User created with id {0}".format(u_id)}), 201
+
