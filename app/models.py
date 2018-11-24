@@ -1,28 +1,25 @@
-# coding: utf-8
-from sqlalchemy import Column, Date, String, TIMESTAMP, text
-from sqlalchemy.dialects.mysql import SMALLINT
-from sqlalchemy.ext.declarative import declarative_base
+# from datetime import datetime
+from app import db
 
-Base = declarative_base()
-metadata = Base.metadata
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(64), index=True, unique=True)
+    created_at = db.Column(db.TIMESTAMP, nullable=False, server_default=db.text("CURRENT_TIMESTAMP"))
+    updated_at = db.Column(db.TIMESTAMP, nullable=False, server_default=db.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
+    bookings = db.relationship('Booking', backref='booker', lazy='dynamic')
 
-
-class Booking(Base):
-    __tablename__ = 'booking'
-
-    id = Column(SMALLINT(5), primary_key=True)
-    user_id = Column(SMALLINT(5), nullable=False)
-    book_id = Column(SMALLINT(5), nullable=False)
-    start_date = Column(Date, nullable=False)
-    end_date = Column(Date, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-    updated_at = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
+    def __repr__(self):
+        return '<User {}>'.format(self.first_name)
 
 
-class User(Base):
-    __tablename__ = 'user'
+class Booking(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    book_id = db.Column(db.Integer)
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    created_at = db.Column(db.TIMESTAMP, nullable=False, server_default=db.text("CURRENT_TIMESTAMP"))
+    updated_at = db.Column(db.TIMESTAMP, nullable=False, server_default=db.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
 
-    id = Column(SMALLINT(5), primary_key=True)
-    first_name = Column(String(64), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-    updated_at = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
+    def __repr__(self):
+        return '<Booking {}>'.format(self.book_id)
