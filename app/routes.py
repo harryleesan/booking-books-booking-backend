@@ -21,6 +21,7 @@ tasks = [
 def not_found(error):
     return make_response(jsonify({'error': 'Not Found'}), 404)
 
+
 @app.route('/api/1.0/tasks', methods=['GET'])
 def get_tasks():
     return jsonify({'tasks': tasks})
@@ -47,11 +48,23 @@ def create_task():
 
 @app.route('/api/1.0/create/user', methods=["POST"])
 def create_user():
-    if not request.json or not 'first_name' in request.json:
+    if not request.json or (not 'first_name' in request.json and not 'last_name' in request.json):
         abort(400)
-    u = User(first_name=request.json['first_name'])
+    u = User(first_name=request.json['first_name'], last_name=request.json['last_name'])
     db.session.add(u)
     db.session.commit()
     u_id = User.query.filter_by(first_name=request.json['first_name']).first().id
     return jsonify({'message': "User created with id {0}".format(u_id)}), 201
+
+@app.route('/api/1.0/create/booking', methods=["POST"])
+def create_booking():
+    if not request.json or (not 'book_id' in request.json and not 'user_id' in request.json):
+        abort(400)
+    u = User.query.get(request.json['user_id'])
+    if not u:
+        abort(500)
+    b = Booking(book_id=request.json['book_id'], booker=u)
+    db.session.add(b)
+    db.session.commit()
+    return jsonify({'message': 'Booking completed'}), 201
 
