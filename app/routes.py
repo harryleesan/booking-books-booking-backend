@@ -48,7 +48,7 @@ def create_task():
 
 @app.route('/api/1.0/create/user', methods=["POST"])
 def create_user():
-    if not request.json or (not 'first_name' in request.json and not 'last_name' in request.json):
+    if not request.json or not 'first_name' in request.json or not 'last_name' in request.json:
         abort(400)
     u = User(first_name=request.json['first_name'], last_name=request.json['last_name'])
     db.session.add(u)
@@ -58,7 +58,7 @@ def create_user():
 
 @app.route('/api/1.0/create/booking', methods=["POST"])
 def create_booking():
-    if not request.json or (not 'book_id' in request.json and not 'user_id' in request.json):
+    if not request.json or not 'book_id' in request.json or not 'user_id' in request.json:
         abort(400)
     u = User.query.get(request.json['user_id'])
     if not u:
