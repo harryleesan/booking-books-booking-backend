@@ -1,6 +1,7 @@
 from app import app, db
 from flask import Flask, jsonify, abort, make_response, request
 from app.models import User, Booking
+import requests
 
 # tasks = [
 #     {
@@ -63,7 +64,14 @@ def create_booking():
     u = User.query.get(request.json['user_id'])
     if not u:
         abort(500)
-    b = Booking(book_id=request.json['book_id'], booker=u)
+    b_id = request.json['book_id']
+    if not b_id:
+        abort(500)
+    book_id_api = requests.get("http://host.docker.internal:8080/book/id/{0}".format(b_id))
+    if book_id_api.status_code != 200:
+        abort(500)
+    book_id = book_id_api.json()
+    b = Booking(book_id=book_id["id"], booker=u)
     db.session.add(b)
     db.session.commit()
     return jsonify({'message': 'Booking completed'}), 201

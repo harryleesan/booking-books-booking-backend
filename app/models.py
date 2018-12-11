@@ -16,7 +16,7 @@ class User(db.Model):
 class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    book_id = db.Column(db.Integer)
+    book_id = db.Column(db.String(64), index=True)
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
     created_at = db.Column(db.TIMESTAMP, nullable=False, server_default=db.text("CURRENT_TIMESTAMP"))
