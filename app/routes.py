@@ -1,4 +1,4 @@
-from app import app, db
+from app import app, db, metrics
 from flask import Flask, jsonify, abort, make_response, request
 from app.models import User, Booking
 import requests

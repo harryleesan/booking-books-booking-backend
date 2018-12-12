@@ -8,14 +8,14 @@ services:
     environment:
       DATABASE_URL: mysql+pymysql://root:password@db/booking
       FLASK_APP: booking.py
-      FLASK_DEBUG: "1"
+      # FLASK_DEBUG: "1"
     volumes:
       - ./:/app
     links:
       - db
     depends_on:
       - db
-    command: ["/bin/bash", "-c", "while true; do echo hello; sleep 10;done"]
+    # command: ["/bin/bash", "-c", "while true; do echo hello; sleep 10;done"]
     container_name: booking
 
   db:
