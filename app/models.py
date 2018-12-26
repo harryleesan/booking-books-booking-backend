@@ -1,5 +1,10 @@
 # from datetime import datetime
 from app import db
+def dump_date(value):
+    """Deserialize datetime object into string form for JSON processing."""
+    if value is None:
+        return None
+    return value.strftime("%Y-%m-%d")
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -24,3 +29,11 @@ class Booking(db.Model):
 
     def __repr__(self):
         return '<Booking {}>'.format(self.book_id)
+
+    @property
+    def serialize(self):
+        return {
+            'book_id': self.book_id,
+            'start_date': dump_date(self.start_date),
+            'end_date': dump_date(self.end_date)
+        }

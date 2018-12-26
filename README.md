@@ -5,6 +5,14 @@
 sqlacodegen mysql+pymysql://root:password@db/booking > models.py
 ```
 
+## Creating a new database using migration
+
+Create a new database `booking`.
+
+```bash
+flask db upgrade
+```
+
 ## Testing the endpoints
 
 ```bash

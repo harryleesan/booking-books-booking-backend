@@ -1,6 +1,7 @@
 from app import app, db, metrics
 from flask import Flask, jsonify, abort, make_response, request
 from app.models import User, Booking
+from sqlalchemy.sql.expression import and_
 import requests
 
 # tasks = [
@@ -59,20 +60,25 @@ def create_user():
 
 @app.route('/api/1.0/create/booking', methods=["POST"])
 def create_booking():
-    if not request.json or not 'book_id' in request.json or not 'user_id' in request.json:
+    if not request.json or not 'book_id' in request.json or not 'user_id' in request.json or not 'start_date' in request.json or not 'end_date' in request.json:
         abort(400)
-    u = User.query.get(request.json['user_id'])
-    if not u:
-        abort(500)
+    u = User.query.get(int(request.json['user_id']))
     b_id = request.json['book_id']
-    if not b_id:
+    if not u or not b_id:
         abort(500)
     book_id_api = requests.get("http://host.docker.internal:8080/book/id/{0}".format(b_id))
     if book_id_api.status_code != 200:
         abort(500)
     book_id = book_id_api.json()
-    b = Booking(book_id=book_id["id"], booker=u)
+    b = Booking(book_id=book_id["id"], booker=u, start_date=request.json["start_date"], end_date=request.json["end_date"])
     db.session.add(b)
     db.session.commit()
     return jsonify({'message': 'Booking completed'}), 201
+
+@app.route('/api/1.0/get/booking', methods=["POST"])
+def get_booking():
+    if not request.json or not 'start_date' in request.json or not 'end_date' in request.json:
+        abort(400)
+    b = Booking.query.filter(and_(Booking.start_date >= request.json["start_date"], Booking.end_date <= request.json["end_date"])).all()
+    return jsonify(bookings=[i.serialize for i in b]), 200
 
