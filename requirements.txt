@@ -6,3 +6,4 @@ sqlacodegen==2.0.1
 Requests==2.21.0
 prometheus_client==0.5.0
 prometheus-flask-exporter==0.4.1
+flask-cors==3.0.7
