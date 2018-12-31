@@ -1,7 +1,7 @@
 from app import app, db, metrics
 from flask import Flask, jsonify, abort, make_response, request
 from app.models import User, Booking
-from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import or_
 import requests
 
 # tasks = [
@@ -79,6 +79,6 @@ def create_booking():
 def get_booking():
     if not request.json or not 'start_date' in request.json or not 'end_date' in request.json:
         abort(400)
-    b = Booking.query.filter(and_(Booking.start_date >= request.json["start_date"], Booking.end_date <= request.json["end_date"])).all()
+    b = Booking.query.filter(or_(Booking.start_date >= request.json["start_date"], Booking.end_date <= request.json["end_date"])).all()
     return jsonify(bookings=[i.serialize for i in b]), 200
 
