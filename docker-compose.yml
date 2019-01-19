@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   booking:
-    # build: ./
+    build: ./
     image: halosan/booking-books-booking-backend:latest
     ports:
       - "5000:5000"
@@ -9,8 +9,8 @@ services:
       DATABASE_URL: mysql+pymysql://root:password@db/booking
       FLASK_APP: booking.py
       # FLASK_DEBUG: "1"
-    volumes:
-      - ./:/app
+    # volumes:
+    #   - ./:/app
     links:
       - db
     depends_on:
@@ -21,7 +21,7 @@ services:
   db:
     image: mysql:8.0
     volumes:
-      - ./db:/var/lib/mysql
+      - booking-backend-mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: booking
@@ -42,3 +42,7 @@ services:
     depends_on:
       - db
     container_name: phpmyadmin
+
+volumes:
+  booking-backend-mysql:
+    external: true
