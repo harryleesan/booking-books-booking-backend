@@ -33,6 +33,7 @@ class Booking(db.Model):
     @property
     def serialize(self):
         return {
+            'user_id': self.user_id,
             'book_id': self.book_id,
             'start_date': dump_date(self.start_date),
             'end_date': dump_date(self.end_date)
