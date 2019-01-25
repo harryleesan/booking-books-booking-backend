@@ -1,7 +1,8 @@
 from app import app, db, metrics
 from flask import Flask, jsonify, abort, make_response, request
 from app.models import User, Booking
-from sqlalchemy.sql.expression import or_
+from sqlalchemy.sql.expression import or_, and_
+import sys
 import requests
 
 # tasks = [
@@ -66,14 +67,18 @@ def create_booking():
     b_id = request.json['book_id']
     if not u or not b_id:
         abort(500)
-    book_id_api = requests.get("http://host.docker.internal:8080/book/id/{0}".format(b_id))
+    book_id_api = requests.get("http://63.34.166.57:8080/book/id/{0}".format(b_id))
     if book_id_api.status_code != 200:
         abort(500)
     book_id = book_id_api.json()
+    check = Booking.query.filter(and_(Booking.book_id == book_id["id"], Booking.start_date <= request.json["end_date"], request.json["start_date"] <= Booking.end_date)).all()
+    print(check, file=sys.stderr)
+    if check:
+        return jsonify({'message': 'Booking overlap.'}), 200
     b = Booking(book_id=book_id["id"], booker=u, start_date=request.json["start_date"], end_date=request.json["end_date"])
     db.session.add(b)
     db.session.commit()
-    return jsonify({'message': 'Booking completed'}), 201
+    return jsonify({'message': 'Booking completed.'}), 201
 
 @app.route('/api/1.0/get/booking', methods=["POST"])
 def get_booking():
